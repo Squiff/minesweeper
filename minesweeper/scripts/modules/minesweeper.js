@@ -1,5 +1,7 @@
 import { MinesweeperModel } from "./minesweepermodel.js";
 import { MinesweeperView } from "./minesweeperview.js";
+import { Timer } from "./timer.js";
+import { CustomEvent } from "./customevent.js";
 
 /* A Game of Minesweeper */
 export class Minesweeper{
@@ -8,6 +10,13 @@ export class Minesweeper{
         const minesweeper = $(selector);
         this.view = new MinesweeperView(minesweeper, options);
         this.model = new MinesweeperModel(options);
+        this.timer = new Timer(500, this.setTime.bind(this));
+
+        this.events = {
+            gameWon: new CustomEvent() // args: winning time
+        }
+
+        this.state = { started: false }
 
         this.bindViewEvents();
     }
@@ -31,6 +40,11 @@ export class Minesweeper{
     }
 
     cellClicked(index){
+        if (this.state.started === false){
+            this.timer.start();
+            this.state.started = true;
+        }
+
         this.model.revealCell(index);
     }
 
@@ -39,20 +53,32 @@ export class Minesweeper{
     }
 
     gameOver(args){
+        this.timer.stop();
         this.view.loseGame(args);
     }
 
     gameWon(){
+        const time = this.timer.stop();
         this.view.winGame();
+
+        this.events.gameWon.trigger(time)
+    }
+
+    setTime(ms){
+        this.view.setTime(ms)
     }
     
     /** restart game with same options */
     restartGame(){
+        this.state.started = false;
+        this.timer.stop();
         this.view.restartGame();
         this.model = new MinesweeperModel(this.model.options);
     }
 
     newGame(options){
+        this.state.started = false;
+        this.timer.stop();
         this.view.newGame(options);
         this.model = new MinesweeperModel(options);
     }

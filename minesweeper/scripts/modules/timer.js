@@ -20,15 +20,20 @@ export class Timer{
 
     stop(){
         clearInterval(this.interval);
+        return this.getElapsedMs();
     }
 
     runCallback(){
-        const now = new Date();
-        const timeElapsed = now - this.startDate;
-
+        const timeElapsed = this.getElapsedMs();
         this.callback(timeElapsed);
     }
 
+    getElapsedMs(){
+        const now = new Date();
+        const timeElapsed = now - this.startDate;
+
+        return timeElapsed;
+    }
 }
 
 

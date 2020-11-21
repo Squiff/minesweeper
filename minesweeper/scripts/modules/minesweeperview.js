@@ -1,5 +1,5 @@
-import { Timer } from "./timer.js";
 import { CustomEvent } from "./customevent.js";
+import * as Utilities from './utilities.js'
 
 
 /** Class responsible for the Minesweeper UI */
@@ -7,13 +7,11 @@ export class MinesweeperView{
 
     /** @param {jQuery} container - The Minesweeper container
      *  @param {{rows: number, columns: number}} options - options specifying grid dimensions */
-    constructor(container, options){
+    constructor(container, options, scores){
         this.container = container;
         this.options = options;
-        this.started = false;
         this.selectedControl = null;
         this.cellsize = 22;
-        this.timer = new Timer(500, this.setTime.bind(this));
 
         this.events = {
             cellClicked: new CustomEvent(),
@@ -64,12 +62,6 @@ export class MinesweeperView{
         if (cell.hasClass('minesweeper-cell-unrevealed') === false)
             return; // already been clicked. Do Nothing.
 
-        // first click. start timer
-        if(this.started === false){
-            this.timer.start();
-            this.started = true;
-        }
-
         // Action depending on selected control
         if (this.selectedControlName() === 'flag')
             this.flagCell(cell);
@@ -85,8 +77,6 @@ export class MinesweeperView{
         this.container.find('.minesweeper-bottom').hide();
 
         this.options = options;
-        this.started = false;
-        this.timer.stop();
         this.setTime(0);
         this.selectControl(control);
         this.createGrid();
@@ -200,28 +190,18 @@ export class MinesweeperView{
 
     /** Set the Timer Value. ms is elapsed milliseconds */
     setTime(ms){
-        const minutes = Math.floor(ms / (60 * 1000));
-        const seconds = Math.floor((ms % (60 * 1000) / 1000));
-        const time = this.zeroPad(minutes, 2) + ':' + this.zeroPad(seconds, 2);
+        // check if there is an hour
+        const hasHour = ms > (1000 * 60 * 60) ;
+        const format = hasHour ? 'HH:mm:ss' : 'mm:ss';
+        const time = Utilities.formatTime(ms, format);
       
         $('#time').html(time);
     }
 
-    /** convert a number [num] to string of [length] and pad with leading zeroes */
-    zeroPad(num, length){
-        const padCount = length - num.toString().length;
-
-        if (padCount > 0){
-            return '0'.repeat(padCount) + num.toString();
-        }
-
-        return num.toString();
-    }
+    
 
     /** Win routine */
     winGame(){
-        this.timer.stop();
-
         const resultContainer = this.container.find('.minesweeper-result');
         resultContainer.html('You Win!');
         resultContainer.css('color','green');
@@ -230,8 +210,6 @@ export class MinesweeperView{
 
     /** Lose routine */
     loseGame(args){
-        this.timer.stop();
-
         // show the clicked bomb
         this.revealCell(args.index, -1);
 

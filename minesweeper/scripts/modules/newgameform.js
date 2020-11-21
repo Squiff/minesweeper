@@ -11,11 +11,10 @@ export class NewGameForm{
     }
 
     startGame(e){
-        e.preventDefault();
-
         const difficulty = $('#difficulty').val();
         const options = this.difficultyOptions[difficulty];
 
+        e.preventDefault();
         this.minesweeper.newGame(options);
     }
 }

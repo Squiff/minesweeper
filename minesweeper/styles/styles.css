@@ -1,15 +1,17 @@
 /*=============== Variables ===============*/
 :root{
     --primary-color: #077282;
+    --primary-color-light: #0891a5;
     --light-color: #f4f4f4;
     --primary-color-text: #ffffff;
 }
 
 
 /*=============== Base ===============*/
-html, body, h1, h2, ol{
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 p, h1, h2, ol {margin: 0 0 1rem 0;}
@@ -31,10 +33,6 @@ h1{
 
 h2{
     font-size: 24px; 
-}
-
-section {
-    padding: 10px 0;
 }
 
 label {
@@ -75,14 +73,6 @@ ol{
     width: 100%;
 }
 
-.block{
-    display: block;
-}
-
-.form-group{
-    margin-bottom: 0.5rem;
-}
-
 .text-center{
     text-align: center;
 }
@@ -92,19 +82,33 @@ ol{
     font-weight: 300;
 }
 
-.display-flex {
+.flex-center {
     display: flex;
-}
-
-.overflow-auto{
-    overflow: auto;
+    justify-content: center;
+    align-items: center;
 }
 
 .bg-light{
     background-color: var(--light-color);
 }
 
-/*=============== Page Specific ===============*/
+.section {
+    padding: 30px 0;
+}
+
+.ms-container {
+    display:flex;
+    overflow: auto;
+}
+
+.mb-5 {margin-bottom: 5px;}
+.mb-10 {margin-bottom: 10px;}
+.mb-15 {margin-bottom: 15px;}
+.mb-20 {margin-bottom: 20px;}
+.mb-25 {margin-bottom: 25px;}
+.mb-30 {margin-bottom: 30px;}
+
+/*=============== Header ===============*/
 .heading{
     display: flex;
     align-items: center;
@@ -114,7 +118,6 @@ ol{
     color: var(--primary-color-text);
 }
 
-/*=============== COMPONENTS ===============*/
 
 /* STYLED ORDERED LIST */
 ol.list-style-square {
@@ -145,7 +148,7 @@ ol.list-style-square > li::before {
 }
 
 
-/* MINESWEEPER */
+/*=============== Minesweeper ===============*/
 
 .minesweeper{
     --ms-light: #dddddd;
@@ -176,9 +179,10 @@ ol.list-style-square > li::before {
     padding: 0.25rem;
     border: 1px outset var(--ms-light);
     border-radius: 0.25rem;
-    width: 20px;
+    width: 30px;
     text-align: center;
     margin-right: 0.25rem;
+    cursor:pointer;
 }
 
 .minesweeper-control.selected {
@@ -278,8 +282,60 @@ ol.list-style-square > li::before {
     font-size: 1.5rem;
 }
 
+/* =========================== Score =======================*/
 
-/*=============== Responsive ===============*/
+.score-tbl {
+    border-spacing: 0;
+}
+
+.score-tbl td, .score-tbl th {
+    border-bottom: 1px solid #222222;
+}
+
+.score-tbl th, .score-tbl td {
+    padding: 10px 20px;
+    text-align: center;
+}
+
+.score-tbl th {
+    background-color: var(--primary-color);
+    color: var(--primary-color-text);
+    font-weight: 600;
+}
+
+.score-new {
+    font-weight: 600;
+}
+
+/* ensures elements are still snter align after adding colored left border */
+td:first-child {
+    border-left: 5px solid transparent;
+}
+
+.score-new td:first-child {
+    border-left: 5px solid var(--primary-color-light);
+}
+
+
+.score-options {
+    display: flex;
+    border-radius: 5px;
+    overflow: auto;
+}
+
+.score-option {
+    background-color: var(--primary-color);
+    color: var(--primary-color-text);
+    padding: 5px 25px;
+    cursor: pointer;
+}
+
+.score-option:hover, .score-option.selected {
+    background-color: var(--primary-color-light);
+}
+
+
+/*=============== MEDIA ===============*/
 /* media queries */
 @media(max-width: 768px){
 

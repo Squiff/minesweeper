@@ -13,8 +13,7 @@
     <header class="heading">
         <h1>Minesweeper</h1>
     </header>
-
-    <section class="how-to bg-light">
+    <section class="section bg-light">
             <h2 class="text-center"><i class="far fa-question-circle"></i> How to Play </h2>
             <div class="container text-large">
                 <p>The goal of Minesweeper is to uncover all of the tiles whilst avoiding the bombs. Simple!</p>
@@ -29,9 +28,9 @@
                 </p>
             </div>
     </section>
-    <section>
-        <div class="container">
-            <form>
+    <section class="section">
+        <div class="container">    
+            <form class="mb-30">
                 <div class="form-group">
                     <label for="">Difficulty</label>
                     <select name="difficulty" id="difficulty" class="block full-width">
@@ -41,12 +40,8 @@
                     </select>
                 </div>
                 <button id="startGame" class="full-width">Start New Game</button>
-            </form>
-        </div>
-    </section>
-    <section>
-        <div class="container">     
-            <div class="display-flex overflow-auto">
+            </form> 
+            <div class="ms-container">
                 <div class="minesweeper">
                     <div class="minesweeper-top">
                         <div class="minesweeper-control-group">
@@ -77,9 +72,43 @@
     
         </div>
     </section>
+    <section class="section bg-light">
+        <div class="container">
+            <h2 class="text-center mb-30"><i class="fas fa-medal"></i> Scores</h2>
+            <div class="scores">
+                <div class="flex-center mb-30">
+                    <div class="score-options">
+                        <div class="score-option selected" data-value="easy">Easy</div>
+                        <div class="score-option" data-value="intermediate">Intermediate</div>
+                        <div class="score-option" data-value="hard">Hard</div>
+                    </div>
+                </div>
+                <div class="flex-center">
+                    <table class="score-tbl">
+                        <thead>
+                            <tr>
+                                <th>Position</th>
+                                <th>Date</th>
+                                <th>Completed In</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
     
-    <!-- Spacer to allow minesweeper game to scroll past the bottom of the window -->
-    <div style="height: 300px;"></div>
+                    <p class="text-large" id="scoreMsg">
+                        <!-- complete a game on [[Mode]] to see scores -->
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Spacer to allow minesweeper game to scroll past the bottom of the window -->
+        <div style="height: 200px;"></div>
+    </section>
+    
+    
+    
     <script src="scripts/main.js" type="module"></script>
 </body>
 </html>
