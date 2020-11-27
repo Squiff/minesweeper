@@ -1,4 +1,4 @@
-import { CustomEvent } from "./customevent.js";
+import { AppEvent } from "./appevent.js";
 import * as Utilities from './utilities.js'
 
 
@@ -14,8 +14,8 @@ export class MinesweeperView{
         this.cellsize = 22;
 
         this.events = {
-            cellClicked: new CustomEvent(),
-            newGame: new CustomEvent()
+            cellClicked: new AppEvent(),
+            newGame: new AppEvent()
         }
 
         this.bindEvents();

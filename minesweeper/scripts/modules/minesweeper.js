@@ -1,7 +1,7 @@
 import { MinesweeperModel } from "./minesweepermodel.js";
 import { MinesweeperView } from "./minesweeperview.js";
 import { Timer } from "./timer.js";
-import { CustomEvent } from "./customevent.js";
+import { AppEvent } from "./appevent.js";
 
 /* A Game of Minesweeper */
 export class Minesweeper{
@@ -13,7 +13,7 @@ export class Minesweeper{
         this.timer = new Timer(500, this.setTime.bind(this));
 
         this.events = {
-            gameWon: new CustomEvent() // args: winning time
+            gameWon: new AppEvent() // args: winning time
         }
 
         this.state = { started: false }

@@ -1,5 +1,5 @@
-/** CustomEvent Class to enable raising/listening to custom events */
-export class CustomEvent{
+/** Custom event Class to enable raising/listening to custom events */
+export class AppEvent{
 
     constructor(){
         this.listeners = [];

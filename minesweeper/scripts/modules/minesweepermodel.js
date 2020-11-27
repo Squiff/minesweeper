@@ -1,4 +1,4 @@
-import { CustomEvent } from "./customevent.js";
+import { AppEvent } from "./appevent.js";
 
 /** Class responsible for the Minesweeper game logic */
 export class MinesweeperModel{
@@ -11,9 +11,9 @@ export class MinesweeperModel{
         this.remainingClearCells = (options.rows * options.columns) - options.bombCount;
 
         this.events = {
-            cellRevealed: new CustomEvent(),    // args: {index: number, bombs: number[]}
-            gameOver: new CustomEvent(),        // args: {index: number, bombs: number[]}
-            gameWon: new CustomEvent()          // args: none
+            cellRevealed: new AppEvent(),    // args: {index: number, bombs: number[]}
+            gameOver: new AppEvent(),        // args: {index: number, bombs: number[]}
+            gameWon: new AppEvent()          // args: none
         }
 
         this.init();

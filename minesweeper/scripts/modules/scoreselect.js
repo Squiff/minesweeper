@@ -1,4 +1,4 @@
-import { CustomEvent } from "./customevent.js";
+import { AppEvent } from "./appevent.js";
 
 /** Group of difficulty options */
 export class ScoreSelect {
@@ -9,7 +9,7 @@ export class ScoreSelect {
         }
 
         this.events = {
-            optionClicked: new CustomEvent() // args - data-value of clicked option
+            optionClicked: new AppEvent() // args - data-value of clicked option
         }
 
         this.bindEvents();
