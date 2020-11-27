@@ -4,20 +4,35 @@ import { gameOptions } from "./modules/gameoptions.js";
 import { Scores } from "./modules/scores.js"
 import { ScoreSelect } from "./modules/scoreselect.js";
 
-const SS = new ScoreSelect();
-const S = new Scores();
-const MS = new Minesweeper('.minesweeper', gameOptions.easy, S);
 
-SS.events.optionClicked.addEventListener((difficulty) => S.renderTable(difficulty));
-MS.events.gameWon.addEventListener((time) => addHighScore('easy', time));
+export class App {
+    constructor(){
+        this.components = {
+            scoreSelect: new ScoreSelect(),
+            scores: new Scores(),
+            minesweeper: new Minesweeper(gameOptions.easy),
+            newGameForm: new NewGameForm()
+        };
 
-function addHighScore(difficulty, time){
-    S.addHighScore(difficulty, time);
-    SS.selectDifficulty(difficulty);
+        this.startUp();
+    }
+
+    startUp(){
+        this.bindAppEvents();
+        this.components.scoreSelect.selectDifficulty('easy');
+    }
+
+    bindAppEvents(){
+        const {scoreSelect, scores, minesweeper, newGameForm}  = this.components;
+
+        newGameForm.events.newGame.addEventListener((options) => minesweeper.newGame(options));
+        minesweeper.events.gameWon.addEventListener((args) => this.addHighScore(args.difficulty, args.time));
+        scoreSelect.events.optionClicked.addEventListener((difficulty) => scores.renderTable(difficulty));        
+    }  
+    
+    addHighScore(difficulty, time){
+        this.components.scores.addHighScore(difficulty, time);
+        this.components.scoreSelect.selectDifficulty(difficulty);
+    }
+
 }
-
-SS.selectDifficulty('easy')
-
-new NewGameForm(MS, gameOptions);
-
-window.S = new Scores();

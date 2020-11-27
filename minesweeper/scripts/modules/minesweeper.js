@@ -5,9 +5,9 @@ import { AppEvent } from "./appevent.js";
 
 /* A Game of Minesweeper */
 export class Minesweeper{
-    /** @param {string} selector - the jQuery selector for the minesweeper container */
-    constructor(selector, options){
-        const minesweeper = $(selector);
+    constructor(options){
+        const minesweeper = $('.minesweeper');
+        this.options = options;
         this.view = new MinesweeperView(minesweeper, options);
         this.model = new MinesweeperModel(options);
         this.timer = new Timer(500, this.setTime.bind(this));
@@ -61,7 +61,12 @@ export class Minesweeper{
         const time = this.timer.stop();
         this.view.winGame();
 
-        this.events.gameWon.trigger(time)
+        const args = {
+            time: time, 
+            difficulty: this.options.difficulty
+        }
+
+        this.events.gameWon.trigger(args)
     }
 
     setTime(ms){
@@ -79,6 +84,8 @@ export class Minesweeper{
     newGame(options){
         this.state.started = false;
         this.timer.stop();
+
+        this.options = options;
         this.view.newGame(options);
         this.model = new MinesweeperModel(options);
     }

@@ -1,7 +1,11 @@
+import { AppEvent } from "./appevent.js";
+import { gameOptions } from "./gameoptions.js";
+
 export class NewGameForm{
-    constructor(minesweeper, options){
-        this.minesweeper = minesweeper;
-        this.difficultyOptions = options;
+    constructor(){
+        this.events = {
+            newGame: new AppEvent() // args: {...options, difficulty}
+        }
 
         this.bindEvents();
     }
@@ -11,10 +15,11 @@ export class NewGameForm{
     }
 
     startGame(e){
-        const difficulty = $('#difficulty').val();
-        const options = this.difficultyOptions[difficulty];
-
         e.preventDefault();
-        this.minesweeper.newGame(options);
+        
+        const difficulty = $('#difficulty').val();
+        const options = gameOptions[difficulty];
+
+        this.events.newGame.trigger(options);
     }
 }
