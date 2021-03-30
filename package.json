@@ -5,20 +5,19 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
-    "start": "webpack serve --config webpack.dev.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "webpack serve --config webpack.dev.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Squiff/minesweeper-website.git"
+    "url": "git+https://github.com/Squiff/minesweeper.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Squiff/minesweeper-website/issues"
+    "url": "https://github.com/Squiff/minesweeper/issues"
   },
-  "homepage": "https://github.com/Squiff/minesweeper-website#readme",
+  "homepage": "https://github.com/Squiff/minesweeper#readme",
   "devDependencies": {
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^5.0.1",
