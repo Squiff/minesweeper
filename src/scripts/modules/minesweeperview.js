@@ -1,13 +1,11 @@
-import { AppEvent } from "./appevent.js";
-import * as Utilities from './utilities.js'
-
+import { AppEvent } from './appevent.js';
+import * as Utilities from './utilities.js';
 
 /** Class responsible for the Minesweeper UI */
-export class MinesweeperView{
-
+export class MinesweeperView {
     /** @param {jQuery} container - The Minesweeper container
      *  @param {{rows: number, columns: number}} options - options specifying grid dimensions */
-    constructor(container, options, scores){
+    constructor(container, options, scores) {
         this.container = container;
         this.options = options;
         this.selectedControl = null;
@@ -15,65 +13,66 @@ export class MinesweeperView{
 
         this.events = {
             cellClicked: new AppEvent(),
-            newGame: new AppEvent()
-        }
+            newGame: new AppEvent(),
+            cellFlagged: new AppEvent(),
+        };
 
         this.bindEvents();
         this.newGame(options);
     }
 
     /** Set UI event listeners */
-    bindEvents(){
+    bindEvents() {
         const minesweeper = this;
         const grid = this.container.find('.minesweeper-grid');
         const playAgainBtn = this.container.find('#play-again');
         const controls = this.container.find('.minesweeper-control');
-        
+
         // Grid Clicked
         grid.click(minesweeper.gridClicked.bind(this));
 
         // Grid Right Click
-        grid.mouseup(function(e){
-            const cell = $(e.target).closest('.minesweeper-cell');
-
-            if (e.button === 2) {
-                minesweeper.flagCell(cell);
-            }
-        })
+        grid.mouseup(minesweeper.griRightClick.bind(this));
 
         // Disable right click context menu on grid
         grid.contextmenu(() => false);
 
         // Play Again Button Click
-        playAgainBtn.click(function(e){
-            minesweeper.events.newGame.trigger();
-        })
+        playAgainBtn.click(() => minesweeper.events.newGame.trigger());
 
         // Controls Clicked
-        controls.click(function(e){
+        controls.click(function (e) {
             minesweeper.selectControl(this);
-        })
+        });
     }
 
     /** Event handler for grid left click */
-    gridClicked(e){
+    gridClicked(e) {
         const cell = $(e.target).closest('.minesweeper-cell');
 
-        if (cell.hasClass('minesweeper-cell-unrevealed') === false)
-            return; // already been clicked. Do Nothing.
+        if (cell.hasClass('minesweeper-cell-unrevealed') === false) return; // already been clicked. Do Nothing.
 
+        const index = cell.index();
         // Action depending on selected control
-        if (this.selectedControlName() === 'flag')
-            this.flagCell(cell);
-        else {
-            const index = cell.index();
+        if (this.selectedControlName() === 'flag') {
+            this.events.cellFlagged.trigger(index);
+        } else {
             this.events.cellClicked.trigger(index);
         }
     }
 
+    griRightClick(e) {
+        if (e.button !== 2) return;
+
+        const cell = $(e.target).closest('.minesweeper-cell');
+        const index = cell.index();
+
+        this.events.cellFlagged.trigger(index);
+    }
+
     /** Start a new game */
-    newGame(options){
-        const control = this.container.find('#minesweeper-flag-control').get(0);        
+    newGame(options) {
+        const control = this.container.find('#minesweeper-flag-control').get(0);
         this.container.find('.minesweeper-bottom').hide();
 
         this.options = options;
@@ -83,12 +82,12 @@ export class MinesweeperView{
     }
 
     /** Start a new game with the same options */
-    restartGame(){
+    restartGame() {
         this.newGame(this.options); // pass in same options
     }
 
     /** create the cells for the main grid */
-    createGrid(){
+    createGrid() {
         const grid = this.container.find('.minesweeper-grid');
         const cellCount = this.options.columns * this.options.rows;
 
@@ -104,7 +103,7 @@ export class MinesweeperView{
     }
 
     /** Manages the overall grid size to ensure each cell is kept square*/
-    squareCells(){
+    squareCells() {
         const gridWidth = this.cellsize * this.options.columns;
         const gridHeight = this.cellsize * this.options.rows;
         const grid = this.container.find('.minesweeper-grid');
@@ -117,69 +116,70 @@ export class MinesweeperView{
      * Set the selected control
      * @param {HTMLElement} element - the control element to be selected
      */
-    selectControl(element){
-        if(this.selectedControl)
-            this.selectedControl.classList.remove('selected');
+    selectControl(element) {
+        if (this.selectedControl) this.selectedControl.classList.remove('selected');
 
         this.selectedControl = element;
         element.classList.add('selected');
     }
 
     /** get the selected control name (data-control-name attribute on the element) */
-    selectedControlName(){
+    selectedControlName() {
         return this.selectedControl.getAttribute('data-control-name');
     }
 
     /** reveals the cell contents for the cell at the specified index. Value -1 indicates a bomb */
-    revealCell(index, value){
+    revealCell(index, value) {
         const grid = this.container.find('.minesweeper-grid');
         const cell = grid.children().eq(index);
 
         cell.removeClass('flag');
         cell.removeClass('minesweeper-cell-unrevealed');
-        cell.addClass('minesweeper-cell-revealed')
+        cell.addClass('minesweeper-cell-revealed');
 
-        if (value === 0){
+        if (value === 0) {
             cell.html('');
-        }  else if (value > 0) {
+        } else if (value > 0) {
             cell.html(value);
-            cell.addClass(`value${value}`)
+            cell.addClass(`value${value}`);
         } else {
             this.addBomb(cell);
-            cell.addClass('valuebomb')
+            cell.addClass('valuebomb');
         }
     }
 
     /** Show all the bomb locations
      * @param {number[]} bombPositions - the indices of all the bombs
-    */
-    showBombs(bombPositions){
+     */
+    showBombs(bombPositions) {
         const grid = this.container.find('.minesweeper-grid');
-        const cells = grid.children()
+        const cells = grid.children();
 
-        bombPositions.forEach(b => {
+        bombPositions.forEach((b) => {
             this.addBomb(cells.eq(b));
-        })
+        });
     }
 
-    /** 
+    /**
      * Add bomb icon to the provided cell
      * @param {jQuery} cell - cell to update
      */
-    addBomb(cell){
+    addBomb(cell) {
         cell.html('<i class="fas fa-bomb"></i>');
         cell.removeClass('flag'); // in case cell was flagged
     }
 
-    /** 
+    /**
      * Toggle the flag icon on a cell
      * @param {jQuery} cell - cell to toggle
      */
-    flagCell(cell){
-        if (cell.hasClass('minesweeper-cell-unrevealed') === false)
-            return
+    flagCell(index) {
+        const grid = this.container.find('.minesweeper-grid');
+        const cell = grid.children().eq(index);
 
-        if (cell.hasClass('flag')){
+        if (cell.hasClass('minesweeper-cell-unrevealed') === false) return;
+
+        if (cell.hasClass('flag')) {
             cell.html('');
         } else {
             cell.html('<i class="fas fa-flag"></i>');
@@ -189,27 +189,25 @@ export class MinesweeperView{
     }
 
     /** Set the Timer Value. ms is elapsed milliseconds */
-    setTime(ms){
+    setTime(ms) {
         // check if there is an hour
-        const hasHour = ms > (1000 * 60 * 60) ;
+        const hasHour = ms > 1000 * 60 * 60;
         const format = hasHour ? 'HH:mm:ss' : 'mm:ss';
         const time = Utilities.formatTime(ms, format);
-      
+
         $('#time').html(time);
     }
 
-    
-
     /** Win routine */
-    winGame(){
+    winGame() {
         const resultContainer = this.container.find('.minesweeper-result');
         resultContainer.html('You Win!');
-        resultContainer.css('color','green');
+        resultContainer.css('color', 'green');
         this.container.find('.minesweeper-bottom').show();
     }
 
     /** Lose routine */
-    loseGame(args){
+    loseGame(args) {
         // show the clicked bomb
         this.revealCell(args.index, -1);
 
@@ -218,8 +216,7 @@ export class MinesweeperView{
 
         const resultContainer = this.container.find('.minesweeper-result');
         resultContainer.html('You Lose!');
-        resultContainer.css('color','red');
+        resultContainer.css('color', 'red');
         this.container.find('.minesweeper-bottom').show();
-
     }
 }
