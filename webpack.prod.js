@@ -12,9 +12,22 @@ module.exports = merge(common, {
         path: path.resolve(__dirname, 'dist'),
         assetModuleFilename: 'img/[name].[contenthash:8][ext]',
     },
-    plugins: [new MiniCssExtractPlugin({ filename: '[name].[contenthash].css' }), new CleanWebpackPlugin()],
+    plugins: [
+        new MiniCssExtractPlugin({ filename: '[name].[contenthash].css' }),
+        new CleanWebpackPlugin(),
+    ],
     module: {
         rules: [
+            {
+                test: /\.m?js$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env'],
+                    },
+                },
+            },
             {
                 test: /\.css$/,
                 use: [
