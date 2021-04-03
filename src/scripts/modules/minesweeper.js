@@ -6,9 +6,8 @@ import { AppEvent } from './appevent.js';
 /* A Game of Minesweeper */
 export class Minesweeper {
     constructor(options) {
-        const minesweeper = $('.minesweeper');
         this.options = options;
-        this.view = new MinesweeperView(minesweeper, options);
+        this.view = new MinesweeperView(options);
         this.model = new MinesweeperModel(options);
         this.timer = new Timer(500, this.setTime.bind(this));
 

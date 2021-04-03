@@ -1,23 +1,28 @@
-import { AppEvent } from "./appevent.js";
-import { gameOptions } from "./gameoptions.js";
+import { AppEvent } from './appevent.js';
+import { gameOptions } from './gameoptions.js';
 
-export class NewGameForm{
-    constructor(){
+export class NewGameForm {
+    constructor() {
         this.events = {
-            newGame: new AppEvent() // args: {...options, difficulty}
-        }
+            newGame: new AppEvent(), // args: {...options, difficulty}
+        };
+
+        this.elements = {
+            startBtn: document.getElementById('startGame'),
+            difficultySelect: document.getElementById('difficulty'),
+        };
 
         this.bindEvents();
     }
 
-    bindEvents(){
-        $('#startGame').click(this.startGame.bind(this));
+    bindEvents() {
+        this.elements.startBtn.addEventListener('click', this.startGame.bind(this));
     }
 
-    startGame(e){
+    startGame(e) {
         e.preventDefault();
-        
-        const difficulty = $('#difficulty').val();
+
+        const difficulty = this.elements.difficultySelect.value;
         const options = gameOptions[difficulty];
 
         this.events.newGame.trigger(options);

@@ -4,7 +4,7 @@ import * as Util from './utilities.js'
 */
 
 /**  Format date as a string in the supplied format */
-function formatDate(date, format){
+function formatDate(date, format) {
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
@@ -13,15 +13,13 @@ function formatDate(date, format){
     const monthStr = zeroPad(month, 2);
     const dayStr = zeroPad(day, 2);
 
-    const output = format.replace('yyyy', year)
-                        .replace('MM', monthStr)
-                        .replace('dd', dayStr)
+    const output = format.replace('yyyy', year).replace('MM', monthStr).replace('dd', dayStr);
 
-    return output
+    return output;
 }
 
 /**  Format time as a string in the supplied format */
-function formatTime(ms, format){
+function formatTime(ms, format) {
     const secondMs = 1000;
     const minuteMs = secondMs * 60;
     const hourMs = minuteMs * 60;
@@ -31,31 +29,46 @@ function formatTime(ms, format){
     const seconds = Math.floor((ms % minuteMs) / secondMs);
     const milliseconds = ms % secondMs;
 
-    const hoursStr = zeroPad(hours, 2) ;
+    const hoursStr = zeroPad(hours, 2);
     const minutesStr = zeroPad(minutes, 2);
     const secondsStr = zeroPad(seconds, 2);
     const msStr = zeroPad(milliseconds, 3);
 
-    const output = format.replace('HH', hoursStr)
-                        .replace('mm', minutesStr)
-                        .replace('ss', secondsStr)
-                        .replace('fff', msStr)
-                        .replace('H', hours)
-                        .replace('m', minutes)
-                        .replace('s', seconds)
+    const output = format
+        .replace('HH', hoursStr)
+        .replace('mm', minutesStr)
+        .replace('ss', secondsStr)
+        .replace('fff', msStr)
+        .replace('H', hours)
+        .replace('m', minutes)
+        .replace('s', seconds);
 
-    return output
+    return output;
 }
 
 /** convert a number [num] to string of [length] and pad with leading zeroes */
-function zeroPad(num, length){
+function zeroPad(num, length) {
     const padCount = length - num.toString().length;
 
-    if (padCount > 0){
+    if (padCount > 0) {
         return '0'.repeat(padCount) + num.toString();
     }
 
     return num.toString();
 }
 
-export { formatDate, zeroPad, formatTime }
+/** Return an array of elements based on selector */
+function getElementArray(selector) {
+    const elements = document.querySelectorAll(selector);
+
+    return Array.from(elements);
+}
+
+/** get index of element amongst siblings */
+function elementIndex(element) {
+    const siblings = Array.from(element.parentNode.children);
+
+    return siblings.indexOf(element);
+}
+
+export { formatDate, zeroPad, formatTime, getElementArray, elementIndex };
