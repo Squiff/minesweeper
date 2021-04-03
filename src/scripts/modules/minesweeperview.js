@@ -1,80 +1,82 @@
-import { AppEvent } from "./appevent.js";
-import * as Utilities from './utilities.js'
-
+import { AppEvent } from './appevent.js';
+import { formatTime, getElementArray, elementIndex } from './utilities.js';
 
 /** Class responsible for the Minesweeper UI */
-export class MinesweeperView{
-
+export class MinesweeperView {
     /** @param {jQuery} container - The Minesweeper container
      *  @param {{rows: number, columns: number}} options - options specifying grid dimensions */
-    constructor(container, options, scores){
-        this.container = container;
+    constructor(options) {
+        this.container = document.querySelector('.minesweeper');
         this.options = options;
         this.selectedControl = null;
         this.cellsize = 22;
 
         this.events = {
             cellClicked: new AppEvent(),
-            newGame: new AppEvent()
-        }
+            newGame: new AppEvent(),
+            cellFlagged: new AppEvent(),
+        };
 
         this.bindEvents();
         this.newGame(options);
     }
 
     /** Set UI event listeners */
-    bindEvents(){
+    bindEvents() {
         const minesweeper = this;
-        const grid = this.container.find('.minesweeper-grid');
-        const playAgainBtn = this.container.find('#play-again');
-        const controls = this.container.find('.minesweeper-control');
-        
+        const grid = this.container.querySelector('.minesweeper-grid');
+        const playAgainBtn = this.container.querySelector('#play-again');
+        const controls = getElementArray('.minesweeper-control');
+
         // Grid Clicked
-        grid.click(minesweeper.gridClicked.bind(this));
+        grid.addEventListener('click', minesweeper.gridClicked.bind(this));
 
         // Grid Right Click
-        grid.mouseup(function(e){
-            const cell = $(e.target).closest('.minesweeper-cell');
-
-            if (e.button === 2) {
-                minesweeper.flagCell(cell);
-            }
-        })
+        grid.addEventListener('mouseup', minesweeper.griRightClick.bind(this));
 
         // Disable right click context menu on grid
-        grid.contextmenu(() => false);
+        grid.addEventListener('contextmenu', (e) => e.preventDefault(e));
 
         // Play Again Button Click
-        playAgainBtn.click(function(e){
-            minesweeper.events.newGame.trigger();
-        })
+        playAgainBtn.addEventListener('click', () => minesweeper.events.newGame.trigger());
 
         // Controls Clicked
-        controls.click(function(e){
-            minesweeper.selectControl(this);
-        })
+        controls.forEach((c) => {
+            c.addEventListener('click', (e) => minesweeper.selectControl(e.target));
+        });
     }
 
     /** Event handler for grid left click */
-    gridClicked(e){
-        const cell = $(e.target).closest('.minesweeper-cell');
+    gridClicked(e) {
+        // get the clicked cell
+        const cell = e.target.closest('.minesweeper-cell');
 
-        if (cell.hasClass('minesweeper-cell-unrevealed') === false)
-            return; // already been clicked. Do Nothing.
+        // already been clicked. Do Nothing.
+        if (cell.classList.contains('minesweeper-cell-unrevealed') === false) return;
+
+        const index = elementIndex(cell);
 
         // Action depending on selected control
-        if (this.selectedControlName() === 'flag')
-            this.flagCell(cell);
-        else {
-            const index = cell.index();
+        if (this.selectedControlName() === 'flag') {
+            this.events.cellFlagged.trigger(index);
+        } else {
             this.events.cellClicked.trigger(index);
         }
     }
 
+    griRightClick(e) {
+        if (e.button !== 2) return;
+
+        const cell = e.target.closest('.minesweeper-cell');
+        const index = elementIndex(cell);
+
+        this.events.cellFlagged.trigger(index);
+    }
+
     /** Start a new game */
-    newGame(options){
-        const control = this.container.find('#minesweeper-flag-control').get(0);        
-        this.container.find('.minesweeper-bottom').hide();
+    newGame(options) {
+        const control = this.container.querySelector('#minesweeper-flag-control');
+        this.container.querySelector('.minesweeper-bottom').style.removeProperty('display');
 
         this.options = options;
         this.setTime(0);
@@ -83,143 +85,144 @@ export class MinesweeperView{
     }
 
     /** Start a new game with the same options */
-    restartGame(){
+    restartGame() {
         this.newGame(this.options); // pass in same options
     }
 
     /** create the cells for the main grid */
-    createGrid(){
-        const grid = this.container.find('.minesweeper-grid');
+    createGrid() {
+        const grid = this.container.querySelector('.minesweeper-grid');
         const cellCount = this.options.columns * this.options.rows;
 
-        grid.empty();
+        const cells = [];
 
         for (let i = 0; i < cellCount; i++) {
-            grid.append('<div class="minesweeper-cell minesweeper-cell-unrevealed"></div>');
+            cells.push('<div class="minesweeper-cell minesweeper-cell-unrevealed"></div>');
         }
 
-        grid.css('grid-template-columns', `repeat(${this.options.columns}, 1fr)`);
+        grid.innerHTML = cells.join('');
+
+        grid.style.setProperty('grid-template-columns', `repeat(${this.options.columns}, 1fr)`);
 
         this.squareCells();
     }
 
     /** Manages the overall grid size to ensure each cell is kept square*/
-    squareCells(){
+    squareCells() {
         const gridWidth = this.cellsize * this.options.columns;
         const gridHeight = this.cellsize * this.options.rows;
-        const grid = this.container.find('.minesweeper-grid');
+        const grid = this.container.querySelector('.minesweeper-grid');
 
-        grid.height(gridHeight);
-        grid.width(gridWidth);
+        grid.style.setProperty('height', `${gridHeight}px`);
+        grid.style.setProperty('width', `${gridWidth}px`);
     }
 
     /**
      * Set the selected control
      * @param {HTMLElement} element - the control element to be selected
      */
-    selectControl(element){
-        if(this.selectedControl)
-            this.selectedControl.classList.remove('selected');
+    selectControl(element) {
+        if (this.selectedControl) this.selectedControl.classList.remove('selected');
 
         this.selectedControl = element;
         element.classList.add('selected');
     }
 
     /** get the selected control name (data-control-name attribute on the element) */
-    selectedControlName(){
+    selectedControlName() {
         return this.selectedControl.getAttribute('data-control-name');
     }
 
     /** reveals the cell contents for the cell at the specified index. Value -1 indicates a bomb */
-    revealCell(index, value){
-        const grid = this.container.find('.minesweeper-grid');
-        const cell = grid.children().eq(index);
+    revealCell(index, value) {
+        const grid = this.container.querySelector('.minesweeper-grid');
+        const cell = Array.from(grid.children)[index];
 
-        cell.removeClass('flag');
-        cell.removeClass('minesweeper-cell-unrevealed');
-        cell.addClass('minesweeper-cell-revealed')
+        cell.classList.remove('flag');
+        cell.classList.remove('minesweeper-cell-unrevealed');
+        cell.classList.add('minesweeper-cell-revealed');
 
-        if (value === 0){
-            cell.html('');
-        }  else if (value > 0) {
-            cell.html(value);
-            cell.addClass(`value${value}`)
+        if (value === 0) {
+            cell.innerHTML = '';
+        } else if (value > 0) {
+            cell.innerHTML = value;
+            cell.classList.add(`value${value}`);
         } else {
             this.addBomb(cell);
-            cell.addClass('valuebomb')
+            cell.classList.add('valuebomb');
         }
     }
 
     /** Show all the bomb locations
      * @param {number[]} bombPositions - the indices of all the bombs
-    */
-    showBombs(bombPositions){
-        const grid = this.container.find('.minesweeper-grid');
-        const cells = grid.children()
+     */
+    showBombs(bombPositions) {
+        const grid = this.container.querySelector('.minesweeper-grid');
+        const cells = Array.from(grid.children);
 
-        bombPositions.forEach(b => {
-            this.addBomb(cells.eq(b));
-        })
+        bombPositions.forEach((b) => {
+            this.addBomb(cells[b]);
+        });
     }
 
-    /** 
+    /**
      * Add bomb icon to the provided cell
      * @param {jQuery} cell - cell to update
      */
-    addBomb(cell){
-        cell.html('<i class="fas fa-bomb"></i>');
-        cell.removeClass('flag'); // in case cell was flagged
+    addBomb(cell) {
+        cell.innerHTML = '<i class="fas fa-bomb"></i>';
+        cell.classList.remove('flag'); // in case cell was flagged
     }
 
-    /** 
+    /**
      * Toggle the flag icon on a cell
      * @param {jQuery} cell - cell to toggle
      */
-    flagCell(cell){
-        if (cell.hasClass('minesweeper-cell-unrevealed') === false)
-            return
+    flagCell(index) {
+        const grid = this.container.querySelector('.minesweeper-grid');
+        const cell = Array.from(grid.children)[index];
 
-        if (cell.hasClass('flag')){
-            cell.html('');
+        if (cell.classList.contains('minesweeper-cell-unrevealed') === false) return;
+
+        if (cell.classList.contains('flag')) {
+            cell.innerHTML = '';
+            cell.classList.remove('flag');
         } else {
-            cell.html('<i class="fas fa-flag"></i>');
+            cell.innerHTML = '<i class="fas fa-flag"></i>';
+            cell.classList.add('flag');
         }
-
-        cell.toggleClass('flag');
     }
 
     /** Set the Timer Value. ms is elapsed milliseconds */
-    setTime(ms){
+    setTime(ms) {
         // check if there is an hour
-        const hasHour = ms > (1000 * 60 * 60) ;
+        const hasHour = ms > 1000 * 60 * 60;
         const format = hasHour ? 'HH:mm:ss' : 'mm:ss';
-        const time = Utilities.formatTime(ms, format);
-      
-        $('#time').html(time);
+        const time = formatTime(ms, format);
+
+        this.container.querySelector('#time').innerHTML = time;
     }
 
-    
-
     /** Win routine */
-    winGame(){
-        const resultContainer = this.container.find('.minesweeper-result');
-        resultContainer.html('You Win!');
-        resultContainer.css('color','green');
-        this.container.find('.minesweeper-bottom').show();
+    winGame() {
+        const resultContainer = this.container.querySelector('.minesweeper-result');
+        resultContainer.innerHTML = 'You Win!';
+        resultContainer.style.setProperty('color', 'green');
+
+        this.container.querySelector('.minesweeper-bottom').style.setProperty('display', 'block');
     }
 
     /** Lose routine */
-    loseGame(args){
+    loseGame(args) {
         // show the clicked bomb
         this.revealCell(args.index, -1);
 
         // show all other bombs
         this.showBombs(args.bombs);
 
-        const resultContainer = this.container.find('.minesweeper-result');
-        resultContainer.html('You Lose!');
-        resultContainer.css('color','red');
-        this.container.find('.minesweeper-bottom').show();
-
+        const resultContainer = this.container.querySelector('.minesweeper-result');
+        resultContainer.innerHTML = 'You Lose!';
+        resultContainer.style.setProperty('color', 'red');
+        this.container.querySelector('.minesweeper-bottom').style.setProperty('display', 'block');
     }
 }

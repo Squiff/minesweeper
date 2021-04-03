@@ -1,41 +1,44 @@
-import { AppEvent } from "./appevent.js";
+import { AppEvent } from './appevent.js';
+import { getElementArray } from './utilities';
 
 /** Group of difficulty options */
 export class ScoreSelect {
-
-    constructor(){
+    constructor() {
         this.elements = {
-            btns: $('.score-option')
-        }
+            btns: getElementArray('.score-option'),
+        };
 
         this.events = {
-            optionClicked: new AppEvent() // args - data-value of clicked option
-        }
+            optionClicked: new AppEvent(), // args - data-value of clicked option
+        };
 
         this.bindEvents();
     }
 
-    bindEvents(){
+    bindEvents() {
         const btns = this.elements.btns;
-        btns.click((e) => this.optionClick($(e.target)))
+
+        btns.forEach((b) => {
+            b.addEventListener('click', (e) => this.optionClick(e.target));
+        });
     }
 
     /** @param {jQuery} btn  */
-    optionClick(btn){
-        const value = btn.attr('data-value');
-        const selected = this.elements.btns.filter('.selected');
-        
-        selected.removeClass('selected');
-        btn.addClass('selected')
+    optionClick(btn) {
+        const value = btn.getAttribute('data-value');
+
+        const selected = this.elements.btns.find((el) => el.classList.contains('selected'));
+        if (selected) selected.classList.remove('selected');
+
+        btn.classList.add('selected');
 
         // raise event to hook into
-        this.events.optionClicked.trigger(value)
+        this.events.optionClicked.trigger(value);
     }
 
-    /** simulate btn click for specified difficulty */ 
-    selectDifficulty(difficulty){
-        const btn = this.elements.btns.filter(`[data-value=${difficulty}]`);
+    /** simulate btn click for specified difficulty */
+    selectDifficulty(difficulty) {
+        const btn = this.elements.btns.find((el) => el.getAttribute('data-value') === difficulty);
         this.optionClick(btn);
     }
-
 }
