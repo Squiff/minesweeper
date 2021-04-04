@@ -42,7 +42,7 @@ export class MinesweeperView {
 
         // Controls Clicked
         controls.forEach((c) => {
-            c.addEventListener('click', (e) => minesweeper.selectControl(e.target));
+            c.addEventListener('click', () => minesweeper.selectControl(c));
         });
     }
 
