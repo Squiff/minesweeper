@@ -2,7 +2,7 @@
 
 # Minesweeper
 
-An implementation of minsweeper written in vanilla JS with no javascript dependancies
+An implementation of Minesweeper written in vanilla JS with no javascript dependancies
 
 ![Game in Progress](/github/game-in-progress.png?raw=true)
 
