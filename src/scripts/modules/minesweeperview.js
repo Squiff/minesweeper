@@ -51,6 +51,9 @@ export class MinesweeperView {
         // get the clicked cell
         const cell = e.target.closest('.minesweeper-cell');
 
+        // handle dead zone between cells
+        if (!cell) return;
+
         // already been clicked. Do Nothing.
         if (cell.classList.contains('minesweeper-cell-unrevealed') === false) return;
 
