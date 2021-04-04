@@ -126,6 +126,7 @@ label {
     justify-content: center;
     height: 150px;
     background: var(--primary-color);
+    /* background by SVGBackgrounds.com */
     background-image: url('../assets/subtle-prism.svg');
     color: var(--primary-color-text);
 }
