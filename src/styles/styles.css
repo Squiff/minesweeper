@@ -338,6 +338,14 @@ label {
     text-align: center;
 }
 
+@media (max-width: 500px) {
+    .score-tbl th,
+    .score-tbl td {
+        padding: 10px 10px;
+        font-size: 0.875rem;
+    }
+}
+
 .score-tbl th {
     background-color: var(--primary-color);
     color: var(--primary-color-text);
