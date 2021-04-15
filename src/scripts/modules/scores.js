@@ -70,8 +70,8 @@ export class Scores {
 
     /** Get time format to be used by Utility formatter */
     getTimeFormat(ms) {
-        const hasHour = ms.completedIn > 1000 * 60 * 60;
-        const hasMin = ms.completedIn > 1000 * 60;
+        const hasHour = ms > 1000 * 60 * 60;
+        const hasMin = ms > 1000 * 60;
 
         return hasHour ? 'H:mm:ss.fff' : hasMin ? 'm:ss.fff' : 's.fff';
     }
