@@ -2,7 +2,7 @@
 
 # Minesweeper
 
-An implementation of Minesweeper written in vanilla JS with no javascript dependancies
+An implementation of minsweeper written in vanilla JS. Check out the site [here](https://minesweeper.asquith.dev).
 
 ![Game in Progress](/github/game-in-progress.png?raw=true)
 
